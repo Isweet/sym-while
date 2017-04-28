@@ -6,9 +6,7 @@ type conc_state = int StringMap.t
 
 let string_of_conc_state c_st =
   let binds = StringMap.bindings c_st in
-  let ret   = ref "" in
-  List.iter (fun (k, v) -> ret := !ret ^ (Printf.sprintf "%s -> %s\n" k (string_of_int v))) binds;
-  "\n" ^ (String.trim !ret)
+  "env = { " ^ (String.concat ", " (List.map (fun (k, v) -> Printf.sprintf "%s -> %s" k (string_of_int v)) binds)) ^ " }"
 
 module Impl : (Semantics.T with type answer = conc_state) =
 struct
