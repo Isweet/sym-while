@@ -1,82 +1,24 @@
-USE_OPT = 1
+EXE_NAME  := symwhile
+TEST_NAME := mike_example
 
-EXE := sym-while
+OCAMLBUILD_FLAGS := -use-ocamlfind -pkgs 'z3' -I src
+OCAMLBUILD       := ocamlbuild $(OCAMLBUILD_FLAGS)
 
-OCAMLFIND := ocamlfind
-OCAMLLEX  := ocamllex
-OCAMLYACC := ocamlyacc
-
-ifdef USE_OPT
-	OEXT     := cmx
-	IEXT     := cmi
-	LOEXT    := cmxa
-	OCAMLC   := $(OCAMLFIND) ocamlopt -g
-	OCAMLDEP := $(OCAMLFIND) ocamldep -native
-else
-	OEXT     := cmo
-	IEXT     := cmi
-	LOEXT    := cma 
-	OCAMLC   := $(OCAMLFIND) ocamlc
-	OCAMLDEP := $(OCAMLFIND) ocamldep
-endif
-
-OBJS_EXE := \
-	lexer.$(OEXT) \
-	ast.$(OEXT) \
-	parser.$(OEXT) \
-	symbol.$(OEXT) \
-	concrete.$(OEXT) \
-	symbolic.$(OEXT) \
-	main.$(OEXT) \
-
-BUILD_FLAGS := -package z3
-LINK_FLAGS  := -linkpkg
-
-sym-while: $(OBJS_EXE)
-	$(OCAMLC) $(BUILD_FLAGS) $(LINK_FLAGS) -o $@ $(OBJS_EXE)
-
-main.cmx: parser.cmi lexer.cmx semantics.cmi
-
-main.cmo : parser.cmi lexer.cmo semantics.cmi
-
-concrete.cmx: semantics.cmi
-
-concrete.cmo: semantics.cmi
-
-symbolic.cmx: semantics.cmi symbol.cmx
-
-symbolic.cmo: semantics.cmi symbol.cmo
-
-lexer.cmx: parser.cmx
-
-lexer.cmo: parser.cmi
-
-parser.cmi: parser.mli ast.cmo
-
-parser.cmx: parser.cmi ast.cmx
-
-parser.cmo: parser.cmi ast.cmo
-
-%.ml: %.mll
-	$(OCAMLLEX) $<
-
-%.ml %.mli: %.mly
-	$(OCAMLYACC) $<
-
-%.cmi: %.mli
-	$(OCAMLC) -c $(BUILD_FLAGS) -o $@ $<
-
-%.cmx: %.ml
-	$(OCAMLC) -c $(BUILD_FLAGS) -o $@ $<
-
-%.cmo: %.ml
-	$(OCAMLC) -c $(BUILD_FLAGS) -o $@ $<
+all: native byte
 
 clean:
-	rm -rf $(EXE)
-	rm -rf lexer.ml
-	rm -rf parser.ml parser.mli
-	rm -rf *.cmi
-	rm -rf *.cmo
-	rm -rf *.cmx
-	rm -rf *.o
+	$(OCAMLBUILD) -clean
+
+native: sanity_check
+	$(OCAMLBUILD) '$(EXE_NAME).native'
+
+byte: sanity_check
+	$(OCAMLBUILD) '$(EXE_NAME).byte'
+
+sanity_check:
+	which z3
+
+test: native
+	./$(EXE_NAME).native res/$(TEST_NAME).while
+
+.PHONY: all clean native byte sanity
