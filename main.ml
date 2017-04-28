@@ -45,7 +45,7 @@ let main () =
   if_debug (fun () -> print_endline (string_of_stmt stmt));
   print_endline (SEM.string_of_answer (SEM.run stmt));
 
-  let res = Symbol.check (Symbol.z3_of_t ()) in
+  let res = Symbol.check (Symbol.z3_of_t (Symbol.LLT ((Symbol.LNum 0), (Symbol.LVar "x")))) in
 
   match res with
     | None -> print_endline "ERR\n"

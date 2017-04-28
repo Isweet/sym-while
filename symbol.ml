@@ -17,6 +17,7 @@ type t =
   | LOr of t * t
   | LLT of int_t * int_t
   | LGT of int_t * int_t
+  | LEq of int_t * int_t
 
 let config = [("model", "true")]
 
@@ -41,6 +42,7 @@ let rec t_of_boolean (b : boolean) : t =
     | BEOr (b1, b2) -> LOr ((t_of_boolean b1), (t_of_boolean b2))
     | BELT (a1, a2) -> LLT ((int_t_of_arith a1), (int_t_of_arith a2))
     | BEGT (a1, a2) -> LGT ((int_t_of_arith a1), (int_t_of_arith a2))
+    | BEEq (a1, a2) -> LEq ((int_t_of_arith a1), (int_t_of_arith a2))
 
 let rec z3_of_int_t (int_sym : int_t) : Z3.Expr.expr = 
   match int_sym with
@@ -61,6 +63,7 @@ let rec z3_of_t (sym : t) : Z3.Expr.expr =
     | LOr (sym1, sym2) -> Z3.Boolean.mk_or context [(z3_of_t sym1); (z3_of_t sym2)]
     | LLT (int_sym1, int_sym2) -> Z3.Arithmetic.mk_lt context (z3_of_int_t int_sym1) (z3_of_int_t int_sym2)
     | LGT (int_sym1, int_sym2) -> Z3.Arithmetic.mk_gt context (z3_of_int_t int_sym1) (z3_of_int_t int_sym2)
+    | LEq (int_sym1, int_sym2) -> Z3.Boolean.mk_eq context (z3_of_int_t int_sym1) (z3_of_int_t int_sym2)
 
 let check (ast : Z3.Expr.expr) : string option =
   let solver = Z3.Solver.mk_simple_solver context in

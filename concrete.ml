@@ -35,6 +35,7 @@ struct
       | BEOr (b1, b2) -> (eval_bool b1 c_st) || (eval_bool b2 c_st)
       | BELT (a1, a2) -> (eval_arith a1 c_st) < (eval_arith a2 c_st)
       | BEGT (a1, a2) -> (eval_arith a1 c_st) > (eval_arith a2 c_st)
+      | BEEq (a1, a2) -> (eval_arith a1 c_st) = (eval_arith a2 c_st)
 
   let rec eval (s : stmt) (c_st : conc_state) : answer =
     match s with
@@ -44,6 +45,12 @@ struct
       | SInput (x) ->
           let n = int_of_string (read_line ()) in
           StringMap.add x n c_st
+      | SAssert (b) ->
+          if eval_bool b c_st then
+            c_st
+          else
+            (print_endline (Printf.sprintf "Assertion Failed: %s" (string_of_boolean b));
+            exit 1)
       | SSkip ->
           c_st
       | SSeq (s1, s2) ->

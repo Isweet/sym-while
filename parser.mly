@@ -16,6 +16,7 @@
 %token OR
 %token LT
 %token GT
+%token EQ
 %token ASSIGN
 %token SKIP
 %token SEMI
@@ -28,13 +29,14 @@
 %token DO
 %token DONE
 %token INPUT
+%token ASSERT
 
 /* Arithmetic */
 %left PLUS MINUS
 %left MULT DIV
 
 /* Relational */
-%left LT GT 
+%left LT GT EQ
 
 /* Logical */
 %left AND OR
@@ -55,6 +57,7 @@ main:
 stmt:
   | VAR ASSIGN arith               { SAssign ($1, $3) }
   | INPUT LPAREN VAR RPAREN        { SInput ($3) }
+  | ASSERT boolean                 { SAssert ($2) }
   | SKIP                           { SSkip }
   | stmt SEMI stmt                 { SSeq ($1, $3) }
   | IF boolean THEN stmt ELSE stmt { SIf ($2, $4, $6) }
@@ -68,6 +71,7 @@ boolean:
   | boolean OR  boolean   { BEOr ($1, $3) }
   | arith   LT  arith     { BELT ($1, $3) }
   | arith   GT  arith     { BEGT ($1, $3) }
+  | arith   EQ  arith     { BEEq ($1, $3) }
   | LPAREN boolean RPAREN { $2 }
 ;
 arith:

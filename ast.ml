@@ -25,6 +25,7 @@ type boolean =
   | BEOr of boolean * boolean
   | BELT of arith * arith
   | BEGT of arith * arith
+  | BEEq of arith * arith
 
 let rec string_of_boolean b =
   match b with
@@ -35,10 +36,12 @@ let rec string_of_boolean b =
     | BEOr  (b1, b2) -> Printf.sprintf "(%s or %s)" (string_of_boolean b1) (string_of_boolean b2)
     | BELT  (a1, a2) -> Printf.sprintf "(%s < %s)" (string_of_arith a1) (string_of_arith a2)
     | BEGT  (a1, a2) -> Printf.sprintf "(%s > %s)" (string_of_arith a1) (string_of_arith a2)
+    | BEEq  (a1, a2) -> Printf.sprintf "(%s = %s)" (string_of_arith a1) (string_of_arith a2)
 
 type stmt = 
   | SAssign of string * arith
   | SInput of string
+  | SAssert of boolean
   | SSkip
   | SSeq of stmt * stmt
   | SIf of boolean * stmt * stmt
@@ -48,6 +51,7 @@ let rec string_of_stmt s =
   match s with
     | SAssign (x, a)  -> Printf.sprintf "%s := %s" x (string_of_arith a)
     | SInput x        -> Printf.sprintf "input(%s)" x
+    | SAssert b       -> Printf.sprintf "assert %s" (string_of_boolean b)
     | SSkip           -> Printf.sprintf "skip"
     | SSeq (s1, s2)   -> Printf.sprintf "%s; %s" (string_of_stmt s1) (string_of_stmt s2)
     | SIf (b, s1, s2) -> Printf.sprintf "if %s then %s else %s" (string_of_boolean b) (string_of_stmt s1) (string_of_stmt s2)

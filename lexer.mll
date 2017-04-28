@@ -25,6 +25,7 @@ let k_or   = "or"
 
 let lt   = '<'
 let gt   = '>'
+let eq   = '='
 
 let assign = ":="
 
@@ -45,6 +46,8 @@ let k_done  = "done"
 
 let k_input = "input"
 
+let k_assert = "assert"
+
 rule token = parse
     whitespace  { token lexbuf }
   | plus        { PLUS }
@@ -56,9 +59,10 @@ rule token = parse
   | k_not       { NOT }
   | k_and       { AND }
   | k_or        { OR }
+  | assign      { ASSIGN }
   | lt          { LT }
   | gt          { GT }
-  | assign      { ASSIGN }
+  | eq          { EQ }
   | k_skip      { SKIP }
   | semi        { SEMI }
   | lparen      { LPAREN }
@@ -70,6 +74,7 @@ rule token = parse
   | k_done      { DONE }
   | k_do        { DO }
   | k_input     { INPUT }
+  | k_assert    { ASSERT }
   | ident       { VAR (Lexing.lexeme lexbuf) }
   | num         { NUM (int_of_string (Lexing.lexeme lexbuf)) }
   | eof         { EOF } 
