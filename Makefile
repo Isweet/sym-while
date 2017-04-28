@@ -29,8 +29,11 @@ OBJS_EXE := \
 	symbolic.$(OEXT) \
 	main.$(OEXT) \
 
+BUILD_FLAGS := -package z3
+LINK_FLAGS  := -linkpkg
+
 sym-while: $(OBJS_EXE)
-	$(OCAMLC) $(LINK_FLAGS) -o $@ $(OBJS_EXE)
+	$(OCAMLC) $(BUILD_FLAGS) $(LINK_FLAGS) -o $@ $(OBJS_EXE)
 
 main.cmx: parser.cmi lexer.cmx semantics.cmi
 
