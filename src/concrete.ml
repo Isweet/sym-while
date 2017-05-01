@@ -6,7 +6,7 @@ type conc_state = int StringMap.t
 
 let string_of_conc_state c_st =
   let binds = StringMap.bindings c_st in
-  "env = { " ^ (String.concat ", " (List.map (fun (k, v) -> Printf.sprintf "%s -> %s" k (string_of_int v)) binds)) ^ " }"
+  "< env = { " ^ (String.concat ", " (List.map (fun (k, v) -> Printf.sprintf "%s -> %s" k (string_of_int v)) binds)) ^ " } >"
 
 module Impl : (Semantics.T with type answer = conc_state) =
 struct
@@ -47,7 +47,7 @@ struct
           if eval_bool b c_st then
             c_st
           else
-            (print_endline (Printf.sprintf "Assertion Failed: %s" (string_of_boolean b));
+            (print_endline (Printf.sprintf "Assertion Failed: %s with\n %s" (string_of_boolean b) (string_of_conc_state c_st));
             exit 1)
       | SSkip ->
           c_st

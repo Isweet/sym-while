@@ -14,7 +14,7 @@ struct
     let binds = StringMap.bindings env in
     let env_str = "env = { " ^ (String.concat ", " (List.map (fun (k, v) -> Printf.sprintf "%s -> %s" k (string_of_int_t v)) binds)) ^ " }" in
     let pc_str  = Printf.sprintf "pc = %s" (string_of_t pc) in
-    "(" ^ env_str ^ " ; " ^ pc_str ^ ")"
+    "< " ^ env_str ^ " ; " ^ pc_str ^ " >"
 
   let string_of_answer s_sts =
     "===\n" ^ (String.concat "" (List.map (fun s_st -> "* " ^ (string_of_sym_state s_st) ^ "\n") s_sts)) ^ "==="
@@ -61,7 +61,7 @@ struct
             | Some _ -> ret := (env, cond_true) :: !ret
             | None   -> ());
           (match sat_false with
-            | Some (ex) -> print_endline (Printf.sprintf "Assertion Violation: %s with model...\n %s" (string_of_boolean b) ex)
+            | Some (ex) -> print_endline (Printf.sprintf "Assertion Violation: %s with\n %s where\n %s" (string_of_boolean b) (string_of_sym_state s_st) (ex))
             | None      -> ());
           !ret
       | SSkip ->

@@ -1,0 +1,12 @@
+input(x);
+input(y);
+m := 42;
+n := x + y;
+if (m > n) then
+  n := n - m
+else
+  skip;
+if (n > 0 or n = 0) then
+  assert false
+else
+  skip
