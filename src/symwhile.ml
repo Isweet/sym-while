@@ -9,7 +9,6 @@ let input      = ref ""
 
 let debug      = ref false
 let sem        = ref Concrete
-let loop_limit = ref 10
 
 let if_debug f =
   if !debug then
@@ -28,9 +27,6 @@ let main () =
                             | "symbolic" -> sem := Symbolic
                             | _          -> raise (Arg.Bad "--semantics (concrete|symbolic)")),
      "Choose semantics with which to run `while` stmt. (default = \"concrete\")");
-    ("--loop-limit",
-     Arg.Set_int loop_limit,
-     "Choose the maximum number of loop iterations to analyze. (default = 10)")
   ] (function s -> input := s) "usage: sym-while (<input file>|--)";
 
   let chan = open_in !input in
