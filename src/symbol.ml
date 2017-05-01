@@ -23,27 +23,6 @@ let config = [("model", "true")]
 
 let context = Z3.mk_context config
 
-let rec int_t_of_arith (a : arith) : int_t =
-  match a with
-    | AEVar x -> LVar x
-    | AENum n -> LNum n
-    | AENegate a' -> LNegate (int_t_of_arith a')
-    | AEPlus (a1, a2) -> LPlus ((int_t_of_arith a1), (int_t_of_arith a2))
-    | AEMinus (a1, a2) -> LMinus ((int_t_of_arith a1), (int_t_of_arith a2))
-    | AEMult (a1, a2) -> LMult ((int_t_of_arith a1), (int_t_of_arith a2))
-    | AEDiv (a1, a2) -> LDiv ((int_t_of_arith a1), (int_t_of_arith a2))
-
-let rec t_of_boolean (b : boolean) : t =
-  match b with
-    | BETrue -> LTrue
-    | BEFalse -> LFalse
-    | BENot b' -> LNot (t_of_boolean b')
-    | BEAnd (b1, b2) -> LAnd ((t_of_boolean b1), (t_of_boolean b2))
-    | BEOr (b1, b2) -> LOr ((t_of_boolean b1), (t_of_boolean b2))
-    | BELT (a1, a2) -> LLT ((int_t_of_arith a1), (int_t_of_arith a2))
-    | BEGT (a1, a2) -> LGT ((int_t_of_arith a1), (int_t_of_arith a2))
-    | BEEq (a1, a2) -> LEq ((int_t_of_arith a1), (int_t_of_arith a2))
-
 let rec z3_of_int_t (int_sym : int_t) : Z3.Expr.expr = 
   match int_sym with
     | LVar x -> Z3.Arithmetic.Integer.mk_const_s context x
@@ -53,6 +32,16 @@ let rec z3_of_int_t (int_sym : int_t) : Z3.Expr.expr =
     | LMinus (int_sym1, int_sym2) -> Z3.Arithmetic.mk_sub context [(z3_of_int_t int_sym1); (z3_of_int_t int_sym2)]
     | LMult (int_sym1, int_sym2) -> Z3.Arithmetic.mk_mul context [(z3_of_int_t int_sym1); (z3_of_int_t int_sym2)]
     | LDiv (int_sym1, int_sym2) -> Z3.Arithmetic.mk_div context (z3_of_int_t int_sym1) (z3_of_int_t int_sym2)
+
+let rec string_of_int_t (int_sym : int_t) : string =
+  match int_sym with
+    | LVar x -> x
+    | LNum n -> string_of_int n
+    | LNegate int_sym' -> Printf.sprintf "- %s" (string_of_int_t int_sym')
+    | LPlus (is1, is2) -> Printf.sprintf "(%s + %s)" (string_of_int_t is1) (string_of_int_t is2)
+    | LMinus (is1, is2) -> Printf.sprintf "(%s - %s)" (string_of_int_t is1) (string_of_int_t is2)
+    | LMult (is1, is2) -> Printf.sprintf "(%s * %s)" (string_of_int_t is1) (string_of_int_t is2)
+    | LDiv (is1, is2) -> Printf.sprintf "(%s / %s)" (string_of_int_t is1) (string_of_int_t is2)
 
 let rec z3_of_t (sym : t) : Z3.Expr.expr = 
   match sym with
@@ -64,6 +53,17 @@ let rec z3_of_t (sym : t) : Z3.Expr.expr =
     | LLT (int_sym1, int_sym2) -> Z3.Arithmetic.mk_lt context (z3_of_int_t int_sym1) (z3_of_int_t int_sym2)
     | LGT (int_sym1, int_sym2) -> Z3.Arithmetic.mk_gt context (z3_of_int_t int_sym1) (z3_of_int_t int_sym2)
     | LEq (int_sym1, int_sym2) -> Z3.Boolean.mk_eq context (z3_of_int_t int_sym1) (z3_of_int_t int_sym2)
+
+let rec string_of_t (sym : t) : string =
+  match sym with
+    | LTrue -> "⊤"
+    | LFalse -> "⊥"
+    | LNot sym' -> Printf.sprintf "¬ %s" (string_of_t sym')
+    | LAnd (sym1, sym2) -> Printf.sprintf "(%s ∧ %s)" (string_of_t sym1) (string_of_t sym2)
+    | LOr (sym1, sym2) -> Printf.sprintf "(%s ∨ %s)" (string_of_t sym1) (string_of_t sym2)
+    | LLT (is1, is2) -> Printf.sprintf "(%s < %s)" (string_of_int_t is1) (string_of_int_t is2)
+    | LGT (is1, is2) -> Printf.sprintf "(%s > %s)" (string_of_int_t is1) (string_of_int_t is2)
+    | LEq (is1, is2) -> Printf.sprintf "(%s = %s)" (string_of_int_t is1) (string_of_int_t is2)
 
 let check (ast : Z3.Expr.expr) : string option =
   let solver = Z3.Solver.mk_simple_solver context in

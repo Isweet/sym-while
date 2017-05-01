@@ -1,4 +1,5 @@
 input(x);
 input(y);
 
+assert not (y = 0);
 result := x / y

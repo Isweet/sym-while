@@ -1,0 +1,11 @@
+input(num);
+
+result := 0;
+
+if 0 < num and num < 65 then
+  while not (num = 1) do
+    num := num / 2;
+    result := result + 1
+  done
+else
+  skip

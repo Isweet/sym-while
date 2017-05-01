@@ -1,0 +1,23 @@
+input(a);
+input(b);
+input(c);
+
+x := 0;
+y := 0;
+z := 0;
+
+if (not (a = 0)) then
+  x := -2
+else
+  skip;
+
+if (b < 5) then
+  if (a = 0 and not (c = 0)) then
+    y := 0
+  else
+    skip;
+  z := 2
+else
+  skip;
+
+assert not (x + y + z = 3)
