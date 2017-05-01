@@ -1,3 +1,5 @@
+SHELL := /bin/bash
+
 EXE_NAME  := symwhile
 TEST_NAME := mike_example
 
@@ -19,6 +21,6 @@ sanity_check:
 	which z3
 
 test: native
-	./$(EXE_NAME).native res/$(TEST_NAME).while
+	./$(EXE_NAME).native --semantics symbolic <(echo "input(x); input(y); assert not (y = 0); result := x / y")
 
 .PHONY: all clean native byte sanity

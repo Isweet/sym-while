@@ -27,7 +27,7 @@ let main () =
                             | "symbolic" -> sem := Symbolic
                             | _          -> raise (Arg.Bad "--semantics (concrete|symbolic)")),
      "Choose semantics with which to run `while` stmt. (default = \"concrete\")");
-  ] (function s -> input := s) "usage: sym-while (<input file>|--)";
+  ] (function s -> input := s) "usage: sym-while <input file>";
 
   let chan = open_in !input in
   let lexbuf = Lexing.from_channel chan in
